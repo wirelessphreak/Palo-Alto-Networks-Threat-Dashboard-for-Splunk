@@ -1,0 +1,271 @@
+<form>
+  <label>Firewall Threat Dashboard</label>
+  <fieldset submitButton="true">
+    <input type="time" token="field1">
+      <label>Time Frame</label>
+      <default>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="field2">
+      <label>Firewall</label>
+      <choice value="*">All Firewalls</choice>
+      <choice value="firewall-1">firewall-1</choice>
+      <choice value="firewall-2">firewall-2</choice>
+      <choice value="firewall-3">firewall-3</choice>
+      <choice value="firewall-4">firewall-4</choice>
+    </input>
+    <input type="text" token="field3">
+      <label>Destination IP (default is any)</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="field4">
+      <label>Source IP (default is any)</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Attack Geo Information</title>
+      <map>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" src_location="*" | iplocation src_ip | geostats latfield=lat longfield=lon count by Country</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="mapping.type">marker</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Attack Categories</title>
+      <chart>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" src_location="*" | top limit=10 category</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=index=%22pan_logs%22%20eventtype=pan_threat%20host=%22*$field2$*%22%20src_location=%22*%22%20%7C%20top%20limit=10%20category&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Threat Trends</title>
+      <single>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" | timechart count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Top 10 Apps Being Attacked</title>
+      <chart>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" | top limit=10 app</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=index=%22pan_logs%22%20eventtype=pan_threat%20host=%22*$field2$*%22%7C%20top%20limit=10%20app&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Identified Vulnerabilities</title>
+      <chart>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" | top limit=10 "threat:name"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Firewall Action Taken</title>
+      <chart>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" | top limit=20 action</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Attacks Overtime Selected</title>
+      <chart>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" | timechart count by threat:name limit=10</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 20 Threat Actions</title>
+      <table>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" action="*" | top limit=20 _time log_subtype threat_name signature_id severity  action app client_ip server_ip  client_location</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="severity">
+          <colorPalette type="map">{"high":#F1813F,"critical":#DC4E41,"medium":#F8BE34,"informational":#62B3B2}</colorPalette>
+        </format>
+        <format type="color" field="action">
+          <colorPalette type="map">{"dropped":#53A051,"blocked":#B6C75A,"reset":#4FA484,"allowed":#DC4E41}</colorPalette>
+        </format>
+        <format type="number" field="percent">
+          <option name="precision">1</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Threat Source Users</title>
+      <chart>
+        <search>
+          <query>index="pan_logs" host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" sourcetype = "pan:threat" | stats count as "Threats Number" by src_user | sort -"Threats Number" | head 10</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Top 10 App Traffic Volume</title>
+      <table>
+        <search>
+          <query>index="pan_logs" host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" sourcetype = "pan:traffic" | stats sum(bytes) AS sbytes by app | sort -sbytes | head 10 | eval "Application and Protocol"=upper(app) | eval "Volume in MB"=round(sbytes/1024/1024) | table "Application and Protocol" "Volume in MB"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Reporting firewalls</title>
+      <chart>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" | top limit=20 host</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 20 Allowed Threats</title>
+      <table>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*"  dest_ip="$field3$" src_ip="$field4$" action=allowed | top limit=20 threat_name signature_id dvc_name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 20 Source IP and Country</title>
+      <table>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" | iplocation src_ip | stats count by src_ip City Region Country | sort by -count (top limit=20 City Region Country src_ip)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Top 20 Destinations</title>
+      <table>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" | top limit=20 dest_ip dest_port app url</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 20 suspicious uri requests</title>
+      <table>
+        <search>
+          <query>index="pan_logs" eventtype=pan_threat host="*$field2$*" dest_ip="$field3$" src_ip="$field4$" | top limit=20 url app</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+</form>
