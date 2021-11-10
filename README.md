@@ -9,7 +9,7 @@ Directions:
 1) Log into Splunk and go to Search
 2) Click on Dashboards and Create a new Dashboard
 3) Once you have created your new dashboard go to edit and select source tab on the top
-4) Clear out the default text in the dashbaord and copy and paste the dasboard from Github.
-5) Before you save the dashaord uou will need to identify your Palo Alto firewall host= fields to populate the field2 drop down menus, I have space holders firewall-1, firewall-2, etc. configured currently
+4) Clear out the default text in the dashboard and copy and paste the dashboard from GitHub
+5) Before you save the dashboard you will need to identify your Palo Alto firewall host= fields to populate the field2 drop down menus, I have space holders firewall-1, firewall-2, etc. configured currently
 
 You should be good to go!
